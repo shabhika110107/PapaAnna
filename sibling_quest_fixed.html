@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sibling Quest - Apology Adventure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Courier+New&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+            transition: all 0.5s ease;
+        }
+
+        /* Terminal Stage */
+        .terminal-stage {
+            background: linear-gradient(45deg, #000000, #1a1a1a, #000000);
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .terminal-stage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 0, 0.03) 2px,
+                rgba(0, 255, 0, 0.03) 4px
+            );
+            pointer-events: none;
+        }
+
+        .terminal-text {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #00FF00; }
+            to { text-shadow: 0 0 20px #00FF00, 0 0 30px #00FF00; }
+        }
+
+        .terminal-input {
+            background: #000;
+            border: 2px solid #00FF00;
+            color: #00FF00;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            margin: 10px;
+            border-radius: 5px;
+            width: 300px;
+        }
+
+        .terminal-btn {
+            background: #00FF00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            animation: pulse 2s infinite;
+            margin: 10px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .error {
+            color: #FF0000;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Main Game Stages */
+        .game-stage {
+            display: none;
+            min-height: 100vh;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Tomato Stage Theme */
+        #tomatoStage {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 50%, #ff4757 100%);
+            position: relative;
+        }
+
+        #tomatoStage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Quiz Stage Theme */
+        #quizStage {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+
+        #quizStage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* Rat Stage Theme */
+        #ratStage {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            position: relative;
+        }
+
+        #ratStage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255, 255, 255, 0.1) 10deg, transparent 20deg);
+            pointer-events: none;
+        }
+
+        /* Input Stage Theme */
+        #inputStage {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            position: relative;
+        }
+
+        #inputStage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%),
+                        linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%);
+            background-size: 30px 30px;
+            pointer-events: none;
+        }
+
+        /* Final Stage Theme */
+        #finalStage {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            position: relative;
+        }
+
+        #finalStage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .game-stage.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .progress-heart {
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .progress-heart.filled {
+            color: #ff69b4;
+            animation: heartBeat 0.5s ease;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* Audio Controls */
+        .audio-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mute-btn {
+            background: #ff69b4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Tomato Stage */
+        .tomato-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+
+        .tomato-img {
+            width: 300px;
+            height: 300px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
+        }
+
+        .tomato-img:hover {
+            transform: scale(1.1) rotate(5deg);
+            animation: wiggle 0.5s ease-in-out;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: scale(1.1) rotate(5deg); }
+            25% { transform: scale(1.1) rotate(-2deg); }
+            75% { transform: scale(1.1) rotate(8deg); }
+        }
+
+        .stage-title {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            color: #ff69b4;
+            margin: 30px 0;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+        }
+
+        .stage-text {
+            font-size: 1.5rem;
+            color: #555;
+            margin: 20px 0;
+        }
+
+        /* Quiz Stage */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .quiz-question {
+            font-size: 2rem;
+            color: #6b73ff;
+            margin: 30px 0;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .quiz-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .quiz-btn {
+            width: 100px;
+            height: 100px;
+            border: none;
+            border-radius: 50%;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-btn.yes {
+            background: linear-gradient(45deg, #98fb98, #90ee90);
+            color: #006400;
+        }
+
+        .quiz-btn.no {
+            background: linear-gradient(45deg, #ffb6c1, #ffa0b4);
+            color: #8b0000;
+        }
+
+        .quiz-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .love-points {
+            font-size: 1.5rem;
+            color: #ff69b4;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        /* Rat Zoom Stage */
+        .rat-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+
+        .rat-img {
+            width: 400px;
+            height: 400px;
+            transition: all 0.5s ease;
+            border-radius: 50%;
+            box-shadow: 0 15px 40px rgba(255, 105, 180, 0.3);
+        }
+
+        .apology-token {
+            display: none;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #8b4513;
+            font-weight: bold;
+            text-align: center;
+            animation: sparkle 2s infinite;
+            box-shadow: 0 0 30px #ffd700;
+            margin: 0 auto;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+
+        /* Input Stage */
+        .input-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .love-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2rem;
+            border: 3px solid #ff69b4;
+            border-radius: 15px;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #ff69b4, #6b73ff);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.4);
+        }
+
+        .hug-image {
+            width: 300px;
+            height: 300px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 20px;
+            margin: 20px 0;
+            background: linear-gradient(45deg, #ff69b4, #ffa500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+        }
+
+        .hug-image:hover {
+            transform: scale(1.05);
+            animation: pulse 1s infinite;
+        }
+
+        /* Final Apology Page */
+        .final-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .memory-item {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #ffeef8, #e8f4fd);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #ffb6c1;
+            font-size: 2rem;
+            margin: 0 auto;
+        }
+
+        .memory-item:hover {
+            transform: translateY(-10px) scale(1.2);
+            box-shadow: 0 15px 30px rgba(255, 105, 180, 0.4);
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-10px) scale(1.2); }
+            50% { transform: translateY(-20px) scale(1.3); }
+        }
+
+        .final-apology {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 25px;
+            margin: 40px 0;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .final-apology h2 {
+            font-family: 'Pacifico', cursive;
+            color: #ff69b4;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .tamil-text {
+            font-size: 1.5rem;
+            color: #6b73ff;
+            margin: 15px 0;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffeef8, #e8f4fd);
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #ff69b4;
+        }
+
+        /* Canvas for particles */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Interactive GIF-like animations */
+        .gif-animation {
+            position: fixed;
+            top: 20%;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+            font-size: 4rem;
+            animation: gifBounce 1s infinite;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        @keyframes gifBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .floating-hearts {
+            position: fixed;
+            top: 10%;
+            left: 10%;
+            font-size: 2rem;
+            animation: floatHearts 3s infinite;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        @keyframes floatHearts {
+            0%, 100% { transform: translateX(0) scale(1); }
+            33% { transform: translateX(20px) scale(1.2); }
+            66% { transform: translateX(-20px) scale(0.8); }
+        }
+
+        .dancing-emoji {
+            position: fixed;
+            bottom: 20%;
+            left: 20px;
+            font-size: 3rem;
+            animation: dance 2s infinite;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        @keyframes dance {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-15deg) scale(1.1); }
+            50% { transform: rotate(0deg) scale(1.2); }
+            75% { transform: rotate(15deg) scale(1.1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stage-title {
+                font-size: 2rem;
+            }
+            
+            .tomato-img, .rat-img {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .quiz-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <span class="progress-text">Quest Progress:</span>
+            <span class="progress-heart" id="heart1">🤍</span>
+            <span class="progress-heart" id="heart2">🤍</span>
+            <span class="progress-heart" id="heart3">🤍</span>
+            <span class="progress-heart" id="heart4">🤍</span>
+            <span class="progress-heart" id="heart5">🤍</span>
+        </div>
+    </div>
+
+    <!-- Audio Controls -->
+    <div class="audio-controls">
+        <button class="mute-btn" onclick="toggleMusic()">🔊</button>
+    </div>
+
+    <!-- Floating Interactive Elements -->
+    <div id="floatingElements">
+        <div class="gif-animation" onclick="showSurprise('gift')" title="Click for surprise!">🎁</div>
+        <div class="floating-hearts" onclick="showSurprise('hearts')" title="Spread love!">💕💖</div>
+        <div class="dancing-emoji" onclick="showSurprise('dance')" title="Let's dance!">💃</div>
+    </div>
+
+    <!-- Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Terminal Stage -->
+    <div id="terminalStage" class="terminal-stage">
+        <div class="terminal-text">
+            <span id="terminalPrompt">Who is my little charm? 💕</span>
+            <span class="cursor">_</span>
+        </div>
+        <input type="text" id="terminalInput" class="terminal-input" placeholder="Enter your answer...">
+        <button onclick="checkTerminalAnswer()" class="terminal-btn">ENTER</button>
+        <div id="terminalError" class="error" style="display: none;"></div>
+        <div id="lovePoints" class="love-points">Love Points: <span id="pointsCount">0</span>/30</div>
+    </div>
+
+    <!-- Tomato Splash Stage -->
+    <div id="tomatoStage" class="game-stage">
+        <div class="tomato-container">
+            <h1 class="stage-title">Tomato Time! 🍅</h1>
+            <p class="stage-text">Click the tomato if you're ready for more, Anna!</p>
+            <div class="tamil-text">அண்ணா, தக்காளியை அழுத்து!</div>
+            <div class="tomato-img" onclick="splashTomato()" style="background: radial-gradient(circle at 30% 30%, #ff6b6b, #ff4757); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8rem;">🍅</div>
+        </div>
+    </div>
+
+    <!-- Quiz Stage -->
+    <div id="quizStage" class="game-stage">
+        <div class="quiz-container">
+            <h1 class="stage-title">Heart Quiz 💖</h1>
+            <div id="quizQuestion" class="quiz-question"></div>
+            <div class="quiz-buttons">
+                <button class="quiz-btn yes" onclick="answerQuiz(true)">💚<br>YES</button>
+                <button class="quiz-btn no" onclick="answerQuiz(false)">❤️<br>NO</button>
+            </div>
+            <div id="quizFeedback" class="stage-text"></div>
+            <div class="love-points">Quiz Points: <span id="quizPoints">0</span>/40</div>
+        </div>
+    </div>
+
+    <!-- Rat Zoom Stage -->
+    <div id="ratStage" class="game-stage">
+        <div class="rat-container">
+            <h1 class="stage-title">Find Eli Kutty! 🐭</h1>
+            <p class="stage-text">Zoom in on your Eli Kutty to find the apology token!</p>
+            <div class="tamil-text">எலி குட்டியை கண்டுபிடி!</div>
+            <div id="ratImg" class="rat-img" style="background: radial-gradient(circle at 30% 30%, #ffecd2, #fcb69f); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12rem;">🐀</div>
+            <div id="apologyToken" class="apology-token hidden">
+                <div>Apology<br>Token<br>💝<br>Forgive Papa?</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Stage -->
+    <div id="inputStage" class="game-stage">
+        <div class="input-container">
+            <h1 class="stage-title">Impress Me! ✨</h1>
+            <p class="stage-text">Type something lovely like "Love you Papa, I am your Anna" 💖</p>
+            <input type="text" id="loveInput" class="love-input" placeholder="Express your love here...">
+            <button onclick="checkLoveInput()" class="submit-btn">Submit Love</button>
+            <div id="inputFeedback" class="stage-text"></div>
+            <div id="hugImage" class="hug-image hidden" onclick="explodeHearts()">🤗</div>
+        </div>
+    </div>
+
+    <!-- Final Apology Stage -->
+    <div id="finalStage" class="game-stage">
+        <div class="final-container">
+            <h1 class="stage-title">Our Beautiful Bond 💕</h1>
+            
+            <div class="memory-grid">
+                <div class="memory-item" onclick="showMemory('egg')">🥚</div>
+                <div class="memory-item" onclick="showMemory('pen')">🖊️</div>
+                <div class="memory-item" onclick="showMemory('bag')">🎒</div>
+                <div class="memory-item" onclick="showMemory('car')">🚗</div>
+                <div class="memory-item" onclick="showMemory('pi')">🔧</div>
+                <div class="memory-item" onclick="showMemory('ferrari')">🏎️</div>
+                <div class="memory-item" onclick="showMemory('game')">🎮</div>
+                <div class="memory-item" onclick="showMemory('github')">💻</div>
+            </div>
+
+            <div class="final-apology">
+                <h2>Dear Teddy (Anna, Buttu) 💖</h2>
+                <div class="tamil-text">அண்ணா, மன்னிச்சிடு!</div>
+                <p style="font-size: 1.3rem; line-height: 1.8; color: #555;">
+                    I'm so sorry from my heart for our fight. As your Papa (Thangama, Eli Kutty), 
+                    I never want to hurt you. You're my everything, Anna. Please forgive your silly Eli Kutty? 
+                    Let's hug it out and be the amazing siblings we are! 🤗
+                    Inime unmiaya unna hurt panama, enoda happie pie ah pathupa anna, sandai podamata, alamata, ala veika mata , 
+                    Papa LOves you soo much epome💖, i have u and u have me en thangamaileee💖💖
+                </p>
+                <div class="tamil-text">உன் எலி குட்டி (Your Eli Kutty) 🐀💕</div>
+            </div>
+
+            <button onclick="createConfetti()" class="submit-btn" style="margin: 20px;">🎉 Celebrate Our Bond!</button>
+            <button onclick="restartQuest()" class="submit-btn">🔄 Replay Quest?</button>
+        </div>
+    </div>
+
+    <!-- Memory Modal -->
+    <div id="memoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="memoryTitle" style="color: #ff69b4; font-family: 'Pacifico', cursive;"></h3>
+            <p id="memoryMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let currentStage = 0;
+        let terminalStep = 0;
+        let quizStep = 0;
+        let totalPoints = 0;
+        let musicPlaying = false;
+        let audioContext = null;
+        let currentOscillator = null;
+
+        // Terminal Questions
+        const terminalQuestions = [
+            "Who is my little charm? 💕",
+            "Who is my whole happiness? 🌟", 
+            "Who is my whole world? 🌍"
+        ];
+
+        const terminalErrors = [
+            "Access Denied! Are you a spy, Buttu? Try again!",
+            "Oops, wrong code! Hint: It's you, Teddy!",
+            "Almost there! Think harder, Anna!"
+        ];
+
+        // Quiz Questions
+        const quizQuestions = [
+            "Are you happy with Papa?",
+            "Is she making you feel special?", 
+            "Will you leave Papa alone?",
+            "Has Papa been there for you when you need her?"
+        ];
+
+        const quizAnswers = [true, true, false, true];
+
+        // Memory Messages
+        const memoryMessages = {
+            egg: { title: "Thirutu paya 🍳", message: "Anna , enaku unoda mutta venuuuu" },
+            pen: { title: "Classroom📚", message: "Thank u for thirudifying my pen anna!!" },
+            bag: { title: "Bday Gifts🌍", message: "bag kuduthadhuku thank u Buttu!" },
+            car: { title: "Remote Car Races 🏁", message: "Those epic races we had, andha horse game, apro car game - you always won but I had more fun!" },
+            pi: { title: "Tech Projects 🔧", message: "Our Raspberry Pi experiments - sorry for the fight, let's code more!" },
+            ferrari: { title: "Dream Cars 🏎️", message: "Our Ferrari dreams will come true, Anna! We'll drive together!" },
+            game: { title: "Gaming Sessions 🎮", message: "Zelda, Fortnite marathons - you're my favorite teammate, Teddy!" },
+            github: { title: "Coding Together 💻", message: "Our GitHub projects - you're the best coding partner, Eli Kutty's Anna!" }
+        };
+
+        // Audio Control with Web Audio API
+        function toggleMusic() {
+            const btn = document.querySelector('.mute-btn');
+            if (musicPlaying) {
+                stopBackgroundMusic();
+                btn.innerHTML = '🔇';
+                musicPlaying = false;
+            } else {
+                playBackgroundMusic();
+                btn.innerHTML = '🔊';
+                musicPlaying = true;
+            }
+        }
+
+        function playBackgroundMusic() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const frequencies = [523.25, 587.33, 659.25, 698.46, 783.99]; // C5, D5, E5, F5, G5
+                let currentNote = 0;
+                
+                function playNote() {
+                    if (musicPlaying && audioContext) {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.frequency.setValueAtTime(frequencies[currentNote], audioContext.currentTime);
+                        oscillator.type = 'sine';
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                        
+                        oscillator.start();
+                        oscillator.stop(audioContext.currentTime + 0.8);
+                        
+                        currentNote = (currentNote + 1) % frequencies.length;
+                        setTimeout(playNote, 1000);
+                    }
+                }
+                
+                playNote();
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        function stopBackgroundMusic() {
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+        }
+
+        // Progress Update
+        function updateProgress(stage) {
+            const heart = document.getElementById(`heart${stage}`);
+            if (heart) {
+                heart.textContent = '💖';
+                heart.classList.add('filled');
+            }
+        }
+
+        // Love Animation System
+        function showLoveAnimation(type) {
+            const animations = {
+                wave: '👋',
+                kiss: '😘',
+                hug: '🤗',
+                hand: '👏',
+                applause: '🎉'
+            };
+            
+            const emoji = animations[type] || '💖';
+            const loveDiv = document.createElement('div');
+            loveDiv.innerHTML = emoji;
+            loveDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 5rem;
+                z-index: 9999;
+                animation: loveFloat 2s ease-out forwards;
+                pointer-events: none;
+            `;
+            
+            // Add keyframe animation
+            if (!document.getElementById('loveAnimationStyle')) {
+                const style = document.createElement('style');
+                style.id = 'loveAnimationStyle';
+                style.textContent = `
+                    @keyframes loveFloat {
+                        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+                        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) translateY(-100px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(loveDiv);
+            setTimeout(() => loveDiv.remove(), 2000);
+        }
+
+        // Play tone function
+        function playTone(frequency, duration) {
+            try {
+                const tempAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = tempAudioContext.createOscillator();
+                const gainNode = tempAudioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(tempAudioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, tempAudioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, tempAudioContext.currentTime + duration);
+                
+                oscillator.start(tempAudioContext.currentTime);
+                oscillator.stop(tempAudioContext.currentTime + duration);
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        // Surprise interactions
+        function showSurprise(type) {
+            switch(type) {
+                case 'gift':
+                    createParticles('confetti');
+                    showLoveAnimation('applause');
+                    playTone(800, 0.2);
+                    break;
+                case 'hearts':
+                    createParticles('hearts');
+                    showLoveAnimation('kiss');
+                    playTone(600, 0.3);
+                    break;
+                case 'dance':
+                    showLoveAnimation('hug');
+                    playTone(400, 0.4);
+                    // Make all elements dance
+                    document.querySelectorAll('.memory-item, .quiz-btn, .tomato-img').forEach(el => {
+                        el.style.animation = 'dance 1s ease-in-out';
+                        setTimeout(() => el.style.animation = '', 1000);
+                    });
+                    break;
+            }
+        }
+
+        // Terminal Stage Logic
+        function checkTerminalAnswer() {
+            const input = document.getElementById('terminalInput');
+            const answer = input.value.trim().toLowerCase();
+            const errorDiv = document.getElementById('terminalError');
+            
+            if (answer === 'anna') {
+                totalPoints += 10;
+                updatePoints();
+                terminalStep++;
+                
+                if (terminalStep < terminalQuestions.length) {
+                    document.getElementById('terminalPrompt').textContent = terminalQuestions[terminalStep];
+                    input.value = '';
+                    errorDiv.style.display = 'none';
+                    showLoveAnimation('wave');
+                } else {
+                    // All correct - advance to next stage
+                    updateProgress(1);
+                    createParticles('confetti');
+                    showLoveAnimation('applause');
+                    playSound('success');
+                    setTimeout(() => {
+                        switchStage('tomatoStage');
+                    }, 2000);
+                }
+            } else {
+                errorDiv.textContent = terminalErrors[terminalStep];
+                errorDiv.style.display = 'block';
+                playSound('error');
+                input.classList.add('error');
+                setTimeout(() => input.classList.remove('error'), 500);
+            }
+            input.value = '';
+        }
+
+        // Tomato Splash
+        function splashTomato() {
+            const tomato = document.querySelector('.tomato-img');
+            tomato.style.transform = 'scale(0)';
+            createParticles('juice');
+            playSound('splash');
+            updateProgress(2);
+            
+            setTimeout(() => {
+                switchStage('quizStage');
+            }, 1500);
+        }
+
+        // Quiz Logic
+        function answerQuiz(answer) {
+            const correct = quizAnswers[quizStep] === answer;
+            const feedback = document.getElementById('quizFeedback');
+            
+            if (correct) {
+                totalPoints += 10;
+                updatePoints();
+                document.getElementById('quizPoints').textContent = (quizStep + 1) * 10;
+                feedback.textContent = "Correct! 💖";
+                feedback.style.color = '#00FF00';
+                createParticles('hearts');
+                
+                // Show love animation based on question
+                const loveAnimations = ['kiss', 'hug', 'hand', 'wave'];
+                showLoveAnimation(loveAnimations[quizStep]);
+                
+                quizStep++;
+                if (quizStep < quizQuestions.length) {
+                    setTimeout(() => {
+                        document.getElementById('quizQuestion').textContent = quizQuestions[quizStep];
+                        feedback.textContent = '';
+                    }, 1500);
+                } else {
+                    feedback.textContent = "Quest Complete! You're the best Anna! 🎉";
+                    showLoveAnimation('applause');
+                    updateProgress(3);
+                    setTimeout(() => {
+                        switchStage('ratStage');
+                    }, 2000);
+                }
+            } else {
+                feedback.textContent = "Aww, really? Try again, Buttu! 😢";
+                feedback.style.color = '#FF0000';
+                playSound('error');
+            }
+        }
+
+        // Rat Zoom Detection
+        let zoomLevel = 1;
+        window.addEventListener('wheel', function(e) {
+            if (document.getElementById('ratStage').classList.contains('active')) {
+                if (e.deltaY < 0) zoomLevel += 0.1;
+                else zoomLevel -= 0.1;
+                
+                if (zoomLevel > 1.5) {
+                    document.getElementById('ratImg').style.display = 'none';
+                    document.getElementById('apologyToken').classList.remove('hidden');
+                    document.getElementById('apologyToken').style.display = 'flex';
+                    updateProgress(4);
+                    setTimeout(() => switchStage('inputStage'), 2000);
+                }
+            }
+        });
+
+        // Love Input Check
+        function checkLoveInput() {
+            const input = document.getElementById('loveInput').value.toLowerCase();
+            const keywords = ['love', 'papa', 'anna', 'lovely'];
+            const matches = keywords.filter(word => input.includes(word)).length;
+            const feedback = document.getElementById('inputFeedback');
+            
+            if (matches >= 2) {
+                feedback.textContent = "Aww, you melted my heart, Buttu! 💖";
+                feedback.style.color = '#00FF00';
+                document.getElementById('hugImage').classList.remove('hidden');
+                showLoveAnimation('hug');
+                totalPoints += 20;
+                updatePoints();
+            } else {
+                feedback.textContent = "Try harder, my charming Anna! Add more love! 💕";
+                feedback.style.color = '#FF6600';
+            }
+        }
+
+        // Explode Hearts
+        function explodeHearts() {
+            createParticles('hearts');
+            updateProgress(5);
+            setTimeout(() => {
+                switchStage('finalStage');
+            }, 2000);
+        }
+
+        // Stage Switching
+        function switchStage(stageId) {
+            document.querySelectorAll('.game-stage, .terminal-stage').forEach(stage => {
+                stage.classList.remove('active');
+                stage.style.display = 'none';
+            });
+            
+            const newStage = document.getElementById(stageId);
+            newStage.style.display = 'block';
+            setTimeout(() => newStage.classList.add('active'), 100);
+            
+            // Change body background for terminal
+            if (stageId === 'terminalStage') {
+                document.body.style.background = '#000';
+            } else {
+                document.body.style.background = 'linear-gradient(135deg, #ffeef8 0%, #e8f4fd 50%, #fff9e6 100%)';
+            }
+        }
+
+        // Particle System
+        function createParticles(type) {
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const colors = type === 'confetti' ? ['#ff69b4', '#6b73ff', '#98fb98', '#ffd700'] : 
+                          type === 'hearts' ? ['#ff69b4', '#ff1493', '#ff6347'] : ['#ffa500', '#ff4500'];
+            
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: -10,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 3 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    life: 100
+                });
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach((particle, index) => {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.life--;
+                    
+                    if (type === 'hearts') {
+                        ctx.font = `${particle.size}px Arial`;
+                        ctx.fillText('💖', particle.x, particle.y);
+                    } else {
+                        ctx.fillStyle = particle.color;
+                        ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+                    }
+                    
+                    if (particle.life <= 0 || particle.y > canvas.height) {
+                        particles.splice(index, 1);
+                    }
+                });
+                
+                if (particles.length > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            
+            animate();
+        }
+
+        // Confetti for final stage
+        function createConfetti() {
+            createParticles('confetti');
+            playSound('celebration');
+        }
+
+        // Memory Modal
+        function showMemory(item) {
+            const modal = memoryMessages[item];
+            document.getElementById('memoryTitle').textContent = modal.title;
+            document.getElementById('memoryMessage').textContent = modal.message;
+            document.getElementById('memoryModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('memoryModal').style.display = 'none';
+        }
+
+        // Sound Effects (placeholder)
+        function playSound(type) {
+            const frequencies = {
+                success: 800,
+                error: 200,
+                splash: 400,
+                celebration: 1000
+            };
+            playTone(frequencies[type] || 600, 0.3);
+        }
+
+        // Update Points Display
+        function updatePoints() {
+            document.getElementById('pointsCount').textContent = totalPoints;
+        }
+
+        // Restart Quest
+        function restartQuest() {
+            currentStage = 0;
+            terminalStep = 0;
+            quizStep = 0;
+            totalPoints = 0;
+            zoomLevel = 1;
+            
+            // Reset UI
+            updatePoints();
+            document.getElementById('quizPoints').textContent = '0';
+            document.querySelectorAll('.progress-heart').forEach(heart => {
+                heart.textContent = '🤍';
+                heart.classList.remove('filled');
+            });
+            
+            // Reset inputs
+            document.getElementById('terminalInput').value = '';
+            document.getElementById('loveInput').value = '';
+            document.getElementById('terminalPrompt').textContent = terminalQuestions[0];
+            document.getElementById('quizQuestion').textContent = quizQuestions[0];
+            
+            // Hide elements
+            document.getElementById('hugImage').classList.add('hidden');
+            document.getElementById('apologyToken').classList.add('hidden');
+            document.getElementById('ratImg').style.display = 'block';
+            
+            switchStage('terminalStage');
+        }
+
+        // Create random floating emoji
+        function createFloatingEmoji(emoji) {
+            const floatingDiv = document.createElement('div');
+            floatingDiv.innerHTML = emoji;
+            floatingDiv.style.cssText = `
+                position: fixed;
+                top: ${Math.random() * 80 + 10}%;
+                left: ${Math.random() * 80 + 10}%;
+                font-size: 2rem;
+                z-index: 999;
+                animation: floatAway 4s ease-out forwards;
+                pointer-events: none;
+            `;
+            
+            if (!document.getElementById('floatAwayStyle')) {
+                const style = document.createElement('style');
+                style.id = 'floatAwayStyle';
+                style.textContent = `
+                    @keyframes floatAway {
+                        0% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+                        50% { opacity: 1; transform: scale(1) rotate(180deg); }
+                        100% { opacity: 0; transform: scale(0.3) rotate(360deg) translateY(-100px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(floatingDiv);
+            setTimeout(() => floatingDiv.remove(), 4000);
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            document.getElementById('quizQuestion').textContent = quizQuestions[0];
+            
+            // Start music on first click
+            document.addEventListener('click', function startMusic() {
+                if (!musicPlaying) {
+                    toggleMusic();
+                }
+                document.removeEventListener('click', startMusic);
+            }, { once: true });
+            
+            // Terminal input focus
+            document.getElementById('terminalInput').focus();
+            
+            // Enter key support
+            document.getElementById('terminalInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkTerminalAnswer();
+            });
+            
+            document.getElementById('loveInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkLoveInput();
+            });
+            
+            // Add random floating interactions
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const randomEmoji = ['✨', '🌟', '💫', '🎈'][Math.floor(Math.random() * 4)];
+                    createFloatingEmoji(randomEmoji);
+                }
+            }, 3000);
+        });
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('memoryModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
